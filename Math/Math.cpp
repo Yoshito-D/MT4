@@ -130,6 +130,60 @@ Vector3 Reflect(const Vector3& input, const Vector3& normal) {
    return result;
 }
 
+Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to) {
+   Vector3 f = from.Normalize();
+   Vector3 t = to.Normalize();
+
+   float cosTheta = std::clamp(f.Dot(t), -1.0f, 1.0f);
+
+   if (cosTheta > 0.999999f) {
+	  return Matrix4x4::Identity();
+   }
+
+   if (cosTheta < -0.999999f) {
+	  Vector3 orthogonal;
+	  if (fabsf(f.x) < fabsf(f.y) && fabsf(f.x) < fabsf(f.z)) {
+		 orthogonal = Vector3{ 1.0f, 0.0f, 0.0f };
+	  } else if (fabsf(f.y) < fabsf(f.z)) {
+		 orthogonal = Vector3{ 0.0f, 1.0f, 0.0f };
+	  } else {
+		 orthogonal = Vector3{ 0.0f, 0.0f, 1.0f };
+	  }
+
+	  Vector3 axis = f.Cross(orthogonal).Normalize();
+	  return MakeRotateAxisAngle(axis, std::numbers::pi_v<float>);
+   }
+
+   Vector3 axis = f.Cross(t).Normalize();
+   float angle = acosf(cosTheta);
+   return MakeRotateAxisAngle(axis, angle);
+}
+
+
+Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
+   Vector3 result = segment.origin + (point - segment.origin).Project(segment.diff);
+   return result;
+}
+
+Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle) {
+   Vector3 n = axis.Normalize();
+   float x = n.x;
+   float y = n.y;
+   float z = n.z;
+   float c = std::cos(angle);
+   float s = std::sin(angle);
+   float t = 1.0f - c;
+
+   Matrix4x4 result = {
+	   t * x * x + c,        t * x * y + s * z,    t * x * z - s * y,    0.0f,
+	   t * x * y - s * z,    t * y * y + c,        t * y * z + s * x,    0.0f,
+	   t * x * z + s * y,    t * y * z - s * x,    t * z * z + c,        0.0f,
+	   0.0f,                 0.0f,                 0.0f,                 1.0f
+   };
+
+   return result;
+}
+
 void Draw::DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {
    const float kGridHalfWidth = 2.0f;
    const uint32_t kSubdivision = 10;
@@ -461,29 +515,6 @@ void Draw::DrawBezier(const Vector3& controlPoint0, const Vector3& contorlPoint1
    }
 }
 
-Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
-   Vector3 result = segment.origin + (point - segment.origin).Project(segment.diff);
-   return result;
-}
-
-Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle) {
-   Vector3 n = axis.Normalize();
-   float x = n.x;
-   float y = n.y;
-   float z = n.z;
-   float c = std::cos(angle);
-   float s = std::sin(angle);
-   float t = 1.0f - c;
-
-   Matrix4x4 result = {
-	   t * x * x + c,        t * x * y + s * z,    t * x * z - s * y,    0.0f,
-	   t * x * y - s * z,    t * y * y + c,        t * y * z + s * x,    0.0f,
-	   t * x * z + s * y,    t * y * z - s * x,    t * z * z + c,        0.0f,
-	   0.0f,                 0.0f,                 0.0f,                 1.0f
-   };
-
-   return result;
-}
 
 
 bool Collision::isCollision(const Sphere& s1, const Sphere& s2) {
