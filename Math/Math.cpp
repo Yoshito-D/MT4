@@ -159,6 +159,23 @@ Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to) {
    return MakeRotateAxisAngle(axis, angle);
 }
 
+Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t) {
+   t = std::clamp(t, 0.0f, 1.0f);
+   float dot = q0.Dot(q1);
+   Quaternion q0Copy = q0;
+   if (dot < 0) {
+	  q0Copy = -q0;
+	  dot = -dot;
+   }
+
+   float theta = std::acos(dot);
+
+   float scale0 = std::sin((1 - t) * theta) / std::sin(theta);
+   float scale1 = std::sin(t * theta) / std::sin(theta);
+
+   return q0Copy * scale0 + q1 * scale1;
+}
+
 
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
    Vector3 result = segment.origin + (point - segment.origin).Project(segment.diff);
