@@ -3,6 +3,7 @@
 #include "Vector3.h"
 #include "Matrix4x4.h"
 #include "Matrix3x3.h"
+#include "Quaternion.h"
 
 struct Sphere {
 	Vector3 center; //!< 中心点
