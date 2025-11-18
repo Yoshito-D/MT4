@@ -184,6 +184,46 @@ Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle) {
    return result;
 }
 
+Quaternion MakeRotateAxisAngleQuaternion(const Vector3& axis, float angle) {
+   Vector3 n = axis.Normalize();
+   float halfAngle = angle * 0.5f;
+   float s = std::sin(halfAngle);
+   Quaternion result = {
+	   n.x * s,
+	   n.y * s,
+	   n.z * s,
+	   std::cos(halfAngle)
+   };
+   return result;
+}
+
+Vector3 RotateVector(const Vector3& vector, const Quaternion& quaternion) {
+   Quaternion p = { vector.x, vector.y, vector.z, 0.0f };
+   Quaternion qConjugate = quaternion.Conjugate();
+   Quaternion rotatedP = quaternion * p * qConjugate;
+   Vector3 result = { rotatedP.x, rotatedP.y, rotatedP.z };
+   return result;
+}
+
+Matrix4x4 MakeRotateMatrix(const Quaternion& quaternion) {
+   Matrix4x4 result = {
+	   std::powf(quaternion.w,2) + std::powf(quaternion.x,2) - std::powf(quaternion.y,2) - std::powf(quaternion.z,2),
+	   2.0f * (quaternion.x * quaternion.y + quaternion.w * quaternion.z),
+	   2.0f * (quaternion.x * quaternion.z - quaternion.w * quaternion.y),
+	   0.0f,
+	   2.0f * (quaternion.x * quaternion.y - quaternion.w * quaternion.z),
+	   std::powf(quaternion.w,2) - std::powf(quaternion.x,2) + std::powf(quaternion.y,2) - std::powf(quaternion.z,2),
+	   2.0f * (quaternion.y * quaternion.z + quaternion.w * quaternion.x),
+	   0.0f,
+	   2.0f * (quaternion.x * quaternion.z + quaternion.w * quaternion.y),
+	   2.0f * (quaternion.y * quaternion.z - quaternion.w * quaternion.x),
+	   std::powf(quaternion.w,2) - std::powf(quaternion.x,2) - std::powf(quaternion.y,2) + std::powf(quaternion.z,2),
+	   0.0f,
+	   0.0f, 0.0f, 0.0f, 1.0f
+   };
+   return result;
+}
+
 void Draw::DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {
    const float kGridHalfWidth = 2.0f;
    const uint32_t kSubdivision = 10;
