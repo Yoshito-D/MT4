@@ -1,6 +1,6 @@
 #include <Novice.h>
 #include "Math/Math.h"
-const char kWindowTitle[] = "LE2A_20_ヨシトダイキ";
+const char kWindowTitle[] = "LE2A_20_ヨシトダイキ_01_01";
 
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
