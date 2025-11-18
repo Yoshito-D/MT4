@@ -98,6 +98,8 @@ Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t);
 
 Vector3 Reflect(const Vector3& input, const Vector3& normal);
 
+Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to);
+
 namespace Draw {
 	void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
 	void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);

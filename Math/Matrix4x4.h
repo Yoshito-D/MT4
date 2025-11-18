@@ -4,6 +4,14 @@
 struct Matrix4x4 {
 	float m[4][4];
 
+	static Matrix4x4 Identity() {
+		Matrix4x4 result = {};
+		for (int i = 0; i < 4; ++i) {
+			result.m[i][i] = 1.0f;
+		}
+		return result;
+	}
+
 	Matrix4x4 operator+(const Matrix4x4& a) const {
 		Matrix4x4 result;
 		for (int i = 0; i < 4; i++) {
